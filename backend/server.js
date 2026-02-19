@@ -5,6 +5,9 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+console.log('Server starting...');
+console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
+
 const authRoutes = require('./routes/auth');
 const movieRoutes = require('./routes/movies');
 const favoriteRoutes = require('./routes/favorites');
