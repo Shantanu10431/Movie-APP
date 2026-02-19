@@ -22,6 +22,10 @@ router.get('/', async (req, res) => {
             success: false,
             error: 'Database connection failed',
             details: error.message,
+            env: {
+                keys: Object.keys(process.env).sort(),
+                hasDbUrl: !!process.env.DATABASE_URL
+            },
             code: error.code,
             meta: error.meta
         });

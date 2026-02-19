@@ -15,8 +15,15 @@ try {
             },
         });
     } else {
-        console.warn("DATABASE_URL is missing. Initializing Prisma with default schema config.");
-        prisma = new PrismaClient();
+        console.warn("DATABASE_URL is missing. Initializing Prisma with DUMMY url to prevent crash.");
+        // We must provide A url to satisfy the schema validation, even if it's fake.
+        prisma = new PrismaClient({
+            datasources: {
+                db: {
+                    url: "postgresql://dummy:dummy@localhost:5432/dummy",
+                },
+            },
+        });
     }
 } catch (error) {
     console.error("Failed to initialize Prisma Client:", error);
