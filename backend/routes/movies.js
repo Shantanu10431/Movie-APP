@@ -3,7 +3,8 @@ const router = express.Router();
 const axios = require('axios');
 
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
-const API_KEY = process.env.OMDB_API_KEY;
+// HARDCODED FALLBACK for Vercel env issue
+const API_KEY = process.env.OMDB_API_KEY || '6ab81ef1';
 
 const fetchFromOmdb = async (params) => {
     try {

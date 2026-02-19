@@ -7,7 +7,9 @@ const { protect } = require('../middleware/auth');
 
 // Generate Token
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    // HARDCODED FALLBACK for Vercel env issue
+    const secret = process.env.JWT_SECRET || 'supersecretjwtkey123456789';
+    return jwt.sign({ id }, secret, { expiresIn: '30d' });
 };
 
 // @route   POST /api/auth/register

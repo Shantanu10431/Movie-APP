@@ -6,7 +6,9 @@ const protect = (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
             token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            // HARDCODED FALLBACK for Vercel env issue
+            const secret = process.env.JWT_SECRET || 'supersecretjwtkey123456789';
+            const decoded = jwt.verify(token, secret);
             req.user = decoded;
             next();
         } catch (error) {
