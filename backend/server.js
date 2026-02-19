@@ -37,6 +37,7 @@ app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/test-db', require('./routes/test-db'));
 
 // Health Check
 app.get('/', (req, res) => {
