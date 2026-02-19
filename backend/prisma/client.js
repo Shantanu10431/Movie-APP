@@ -15,12 +15,11 @@ try {
             },
         });
     } else {
-        console.warn("DATABASE_URL is missing. Initializing Prisma with DUMMY url to prevent crash.");
-        // We must provide A url to satisfy the schema validation, even if it's fake.
+        console.warn("DATABASE_URL is missing. Using HARDCODED fallback (Emergency Fix).");
         prisma = new PrismaClient({
             datasources: {
                 db: {
-                    url: "postgresql://dummy:dummy@localhost:5432/dummy",
+                    url: "postgres://avnadmin:AVNS_6sb1c9Hege1FH6rY7kU@pg-25579498-movienova.d.aivencloud.com:22367/defaultdb?sslmode=require",
                 },
             },
         });
