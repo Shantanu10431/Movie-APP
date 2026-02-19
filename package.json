@@ -1,0 +1,12 @@
+{
+    "name": "movienova-monorepo",
+    "private": true,
+    "workspaces": [
+        "frontend",
+        "backend"
+    ],
+    "scripts": {
+        "build": "echo 'Building...'",
+        "postinstall": "cd backend && npm run postinstall"
+    }
+}
