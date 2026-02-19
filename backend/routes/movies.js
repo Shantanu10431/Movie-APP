@@ -1,90 +1,163 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios'); // We need to install axios in backend too or use fetch
-const { protect } = require('../middleware/auth');
+const axios = require('axios');
 
-// We need to install axios: npm install axios
-// For now, let's assume we'll run that or use fetch. Let's stick to axios as per prompt.
+const OMDB_BASE_URL = 'http://www.omdbapi.com/';
+const API_KEY = process.env.OMDB_API_KEY;
 
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = process.env.TMDB_API_KEY;
-
-const fetchFromTmdb = async (endpoint, params = {}) => {
+const fetchFromOmdb = async (params) => {
     try {
-        const response = await axios.get(`${TMDB_BASE_URL}${endpoint}`, {
+        const response = await axios.get(OMDB_BASE_URL, {
             params: {
-                api_key: API_KEY,
-                ...params,
-            },
+                apikey: API_KEY,
+                ...params
+            }
         });
         return response.data;
     } catch (error) {
+        console.error("OMDB Request Failed:", error.message);
         throw error;
     }
 };
 
 // @route   GET /api/movies/trending
-// @access  Public
+// @desc    Get 2024 movies (Search 'movie' in 2024 to avoid "Too many results")
 router.get('/trending', async (req, res) => {
     try {
-        const data = await fetchFromTmdb('/trending/movie/week');
-        res.json({ success: true, data: data.results });
+        const data = await fetchFromOmdb({ s: 'movie', y: '2024', type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to fetch trending movies' });
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
     }
 });
 
 // @route   GET /api/movies/popular
-// @access  Public
+// @desc    Get 2023 movies (Search 'love' in 2023)
 router.get('/popular', async (req, res) => {
     try {
-        const data = await fetchFromTmdb('/movie/popular');
-        res.json({ success: true, data: data.results });
+        const data = await fetchFromOmdb({ s: 'love', y: '2023', type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to fetch popular movies' });
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
     }
 });
 
 // @route   GET /api/movies/top-rated
-// @access  Public
+// @desc    Get Oscar movies from 2023/2024
 router.get('/top-rated', async (req, res) => {
     try {
-        const data = await fetchFromTmdb('/movie/top_rated');
-        res.json({ success: true, data: data.results });
+        const data = await fetchFromOmdb({ s: 'killers', y: '2023', type: 'movie' });
+        const data2 = await fetchFromOmdb({ s: 'oppenheimer', type: 'movie' });
+
+        let combined = [];
+        if (data.Response === 'True') combined = [...combined, ...data.Search];
+        if (data2.Response === 'True') combined = [...combined, ...data2.Search];
+
+        const valid = combined.filter(m => m.Poster && m.Poster !== 'N/A');
+        res.json({ success: true, data: valid });
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to fetch top rated movies' });
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
     }
 });
 
 // @route   GET /api/movies/upcoming
-// @access  Public
+// @desc    Get 2025 movies
 router.get('/upcoming', async (req, res) => {
     try {
-        const data = await fetchFromTmdb('/movie/upcoming');
-        res.json({ success: true, data: data.results });
+        const data = await fetchFromOmdb({ s: 'american', y: '2025', type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Failed to fetch upcoming movies' });
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
+    }
+});
+
+// @route   GET /api/movies/action
+router.get('/action', async (req, res) => {
+    try {
+        const data = await fetchFromOmdb({ s: 'civil', y: '2024', type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
+    }
+});
+
+// @route   GET /api/movies/comedy
+router.get('/comedy', async (req, res) => {
+    try {
+        const data = await fetchFromOmdb({ s: 'comedy', y: '2024', type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
+    }
+});
+
+// @route   GET /api/movies/series
+router.get('/series', async (req, res) => {
+    try {
+        // 'house' returns House of Dragon, House of Ninjas etc
+        const data = await fetchFromOmdb({ s: 'house', y: '2024', type: 'series' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: 'Failed to fetch movies' });
     }
 });
 
 // @route   GET /api/movies/search?q=query
-// @access  Public
 router.get('/search', async (req, res) => {
     const { q } = req.query;
     try {
-        const data = await fetchFromTmdb('/search/movie', { query: q });
-        res.json({ success: true, data: data.results });
+        const data = await fetchFromOmdb({ s: q, type: 'movie' });
+        if (data.Response === 'True') {
+            const valid = data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+            res.json({ success: true, data: valid });
+        } else {
+            res.json({ success: true, data: [] });
+        }
     } catch (error) {
         res.status(500).json({ success: false, error: 'Failed to search movies' });
     }
 });
 
 // @route   GET /api/movies/:id
-// @access  Public
+// @desc    Get details by IMDb ID
 router.get('/:id', async (req, res) => {
     try {
-        const data = await fetchFromTmdb(`/movie/${req.params.id}`, { append_to_response: 'credits,videos,similar' });
-        res.json({ success: true, data: data });
+        const data = await fetchFromOmdb({ i: req.params.id, plot: 'full' });
+        if (data.Response === 'True') {
+            res.json({ success: true, data: data });
+        } else {
+            res.status(404).json({ success: false, error: 'Movie not found' });
+        }
     } catch (error) {
         res.status(500).json({ success: false, error: 'Failed to fetch movie details' });
     }

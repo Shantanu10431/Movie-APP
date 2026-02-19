@@ -30,11 +30,12 @@ export default function MovieDetails() {
             <Navbar />
 
             {/* Backdrop */}
-            <div className="relative h-[70vh] w-full">
+            <div className="relative h-[70vh] w-full overflow-hidden">
+                <div className="absolute inset-0 bg-[#0f1014]" />
                 <img
-                    src={`${IMAGE_ORIGINAL_URL}${movie.backdrop_path}`}
-                    alt={movie.title}
-                    className="w-full h-full object-cover opacity-50"
+                    src={movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : "https://via.placeholder.com/1280x720?text=No+Image"}
+                    alt={movie.Title}
+                    className="w-full h-full object-cover opacity-30 blur-md"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f1014] via-transparent to-transparent" />
             </div>
@@ -43,51 +44,41 @@ export default function MovieDetails() {
                 {/* Poster */}
                 <div className="w-64 flex-shrink-0 mx-auto md:mx-0">
                     <img
-                        src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}${movie.poster_path}`}
-                        alt={movie.title}
+                        src={movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : "https://via.placeholder.com/500x750?text=No+Image"}
+                        alt={movie.Title}
                         className="w-full rounded-lg shadow-2xl"
                     />
                 </div>
 
                 {/* Details */}
                 <div className="flex-1 space-y-6 pt-10">
-                    <h1 className="text-5xl font-bold">{movie.title} <span className="text-gray-400 text-3xl">({new Date(movie.release_date).getFullYear()})</span></h1>
+                    <h1 className="text-4xl md:text-5xl font-bold">{movie.Title} <span className="text-gray-400 text-3xl">({movie.Year})</span></h1>
 
-                    <div className="flex items-center gap-6 text-sm text-gray-300">
-                        <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-500 fill-current" /> {movie.vote_average.toFixed(1)}</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {movie.release_date}</span>
-                        <span>{movie.runtime} min</span>
+                    <div className="flex items-center gap-6 text-sm text-gray-300 flex-wrap">
+                        {movie.imdbRating && movie.imdbRating !== 'N/A' && (
+                            <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-500 fill-current" /> {movie.imdbRating}</span>
+                        )}
+                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {movie.Released}</span>
+                        <span>{movie.Runtime}</span>
                         <div className="flex gap-2">
-                            {movie.genres?.map(g => (
-                                <span key={g.id} className="bg-[#333] px-2 py-1 rounded-sm text-xs">{g.name}</span>
+                            {movie.Genre?.split(', ').map(g => (
+                                <span key={g} className="bg-[#333] px-2 py-1 rounded-sm text-xs">{g}</span>
                             ))}
                         </div>
                     </div>
 
                     <div className="max-w-3xl">
                         <h3 className="text-xl font-bold mb-2">Overview</h3>
-                        <p className="text-gray-300 leading-relaxed text-lg">{movie.overview}</p>
+                        <p className="text-gray-300 leading-relaxed text-lg">{movie.Plot}</p>
                     </div>
 
                     {/* Cast */}
                     <div>
-                        <h3 className="text-xl font-bold mb-4">Top Cast</h3>
-                        <div className="flex gap-4 overflow-x-auto pb-4">
-                            {movie.credits?.cast?.slice(0, 5).map(actor => (
-                                <div key={actor.id} className="w-24 flex-shrink-0 text-center">
-                                    {actor.profile_path ? (
-                                        <img
-                                            src={`${process.env.NEXT_PUBLIC_TMDB_IMAGE_URL}${actor.profile_path}`}
-                                            className="w-24 h-24 rounded-full object-cover mb-2"
-                                            alt={actor.name}
-                                        />
-                                    ) : (
-                                        <div className="w-24 h-24 rounded-full bg-gray-700 mb-2 flex items-center justify-center text-xs">No Image</div>
-                                    )}
-                                    <p className="text-sm font-medium truncate">{actor.name}</p>
-                                    <p className="text-xs text-gray-500 truncate">{actor.character}</p>
-                                </div>
-                            ))}
+                        <h3 className="text-xl font-bold mb-4">Cast & Crew</h3>
+                        <div className="text-gray-400 space-y-2">
+                            <p><span className="text-white font-bold">Director:</span> {movie.Director}</p>
+                            <p><span className="text-white font-bold">Writers:</span> {movie.Writer}</p>
+                            <p><span className="text-white font-bold">Actors:</span> {movie.Actors}</p>
                         </div>
                     </div>
                 </div>

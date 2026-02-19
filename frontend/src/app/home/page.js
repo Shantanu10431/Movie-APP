@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
+import MovieRow from '@/components/MovieRow';
 import MovieCard from '@/components/MovieCard';
 import { moviesApi } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -15,6 +16,11 @@ export default function Home() {
     const router = useRouter();
     const [trending, setTrending] = useState([]);
     const [popular, setPopular] = useState([]);
+    const [topRated, setTopRated] = useState([]);
+    const [upcoming, setUpcoming] = useState([]);
+    const [action, setAction] = useState([]);
+    const [comedy, setComedy] = useState([]);
+    const [series, setSeries] = useState([]);
     const [bannerMovie, setBannerMovie] = useState(null);
     const [dataLoading, setDataLoading] = useState(true);
 
@@ -27,12 +33,22 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [trendingRes, popularRes] = await Promise.all([
+                const [trendingRes, popularRes, topRatedRes, upcomingRes, actionRes, comedyRes, seriesRes] = await Promise.all([
                     moviesApi.getTrending(),
                     moviesApi.getPopular(),
+                    moviesApi.getTopRated(),
+                    moviesApi.getUpcoming(),
+                    moviesApi.getAction(),
+                    moviesApi.getComedy(),
+                    moviesApi.getSeries(),
                 ]);
                 setTrending(trendingRes.data.data);
                 setPopular(popularRes.data.data);
+                setTopRated(topRatedRes.data.data);
+                setUpcoming(upcomingRes.data.data);
+                setAction(actionRes.data.data);
+                setComedy(comedyRes.data.data);
+                setSeries(seriesRes.data.data);
 
                 // Set random banner movie
                 const random = Math.floor(Math.random() * trendingRes.data.data.length - 1);
@@ -61,20 +77,26 @@ export default function Home() {
             {bannerMovie && (
                 <div className="relative h-[80vh] w-full">
                     <div className="absolute inset-0">
+                        {/* OMDB doesn't have backdrop, use Poster with blur or just cover */}
+                        <div className="absolute inset-0 bg-[#0f1014]" />
                         <img
-                            src={`${IMAGE_ORIGINAL_URL}${bannerMovie.backdrop_path}`}
-                            alt={bannerMovie.title}
-                            className="w-full h-full object-cover opacity-60"
+                            src={bannerMovie.Poster !== 'N/A' ? bannerMovie.Poster : "https://via.placeholder.com/1280x720?text=No+Image"}
+                            alt={bannerMovie.Title}
+                            className="w-full h-full object-cover opacity-40 blur-sm md:blur-md"
                         />
+                        <div className="absolute inset-0 flex justify-end md:justify-center items-center opacity-30">
+                            <img src={bannerMovie.Poster} className="h-full object-contain hidden md:block" />
+                        </div>
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0f1014] via-transparent to-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
                     </div>
 
                     <div className="absolute bottom-[20%] left-4 md:left-12 max-w-2xl text-white space-y-4">
-                        <h1 className="text-5xl md:text-6xl font-bold drop-shadow-xl">{bannerMovie.title}</h1>
-                        <p className="text-lg line-clamp-3 text-gray-200 drop-shadow-md max-w-xl">
-                            {bannerMovie.overview}
-                        </p>
+                        <h1 className="text-4xl md:text-6xl font-bold drop-shadow-xl">{bannerMovie.Title}</h1>
+                        <div className="flex gap-2 text-gray-300 font-bold">
+                            <span>{bannerMovie.Year}</span>
+                            <span className="uppercase border px-1 text-xs items-center flex">{bannerMovie.Type}</span>
+                        </div>
                         <div className="flex gap-4 pt-4">
                             <button className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-md font-bold hover:bg-opacity-80 transition">
                                 <Play className="w-5 h-5 fill-black" /> Play
@@ -88,24 +110,14 @@ export default function Home() {
             )}
 
             {/* Rows */}
-            <div className="px-4 md:px-12 -mt-24 relative z-10 space-y-12">
-                <section>
-                    <h2 className="text-2xl font-bold mb-4 text-white">Trending Now</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {trending.map(movie => (
-                            <MovieCard key={movie.id} movie={movie} />
-                        ))}
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="text-2xl font-bold mb-4 text-white">Popular on MovieNova</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {popular.map(movie => (
-                            <MovieCard key={movie.id} movie={movie} />
-                        ))}
-                    </div>
-                </section>
+            <div className={`pl-4 md:pl-12 relative z-10 pb-24 ${bannerMovie ? '-mt-24' : 'pt-24'}`}>
+                <MovieRow title="Box Office 2024" movies={trending} />
+                <MovieRow title="Best of 2023" movies={popular} />
+                <MovieRow title="Award Winners" movies={topRated} />
+                <MovieRow title="Coming Soon (2025)" movies={upcoming} />
+                <MovieRow title="Action (War Movies 2024)" movies={action} />
+                <MovieRow title="Romance & Comedy 2024" movies={comedy} />
+                <MovieRow title="TV Series 2024" movies={series} />
             </div>
         </div>
     );

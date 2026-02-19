@@ -24,6 +24,9 @@ export const moviesApi = {
     getPopular: () => api.get('/movies/popular'),
     getTopRated: () => api.get('/movies/top-rated'),
     getUpcoming: () => api.get('/movies/upcoming'),
+    getAction: () => api.get('/movies/action'),
+    getComedy: () => api.get('/movies/comedy'),
+    getSeries: () => api.get('/movies/series'),
     search: (query) => api.get(`/movies/search?q=${query}`),
     getDetails: (id) => api.get(`/movies/${id}`),
 };

@@ -14,38 +14,37 @@ export default function MovieCard({ movie, isFavorite = false, onToggleFavorite 
     const handleFavorite = async (e) => {
         e.preventDefault();
         if (added) {
-            await favoritesApi.remove(movie.id);
+            await favoritesApi.remove(movie.imdbID);
             setAdded(false);
         } else {
             await favoritesApi.add({
-                movieId: movie.id,
-                title: movie.title,
-                posterPath: movie.poster_path
+                movieId: movie.imdbID,
+                title: movie.Title,
+                posterPath: movie.Poster
             });
             setAdded(true);
         }
-        if (onToggleFavorite) onToggleFavorite(movie.id);
+        if (onToggleFavorite) onToggleFavorite(movie.imdbID);
     };
 
     return (
-        <Link href={`/movie/${movie.id}`}>
+        <Link href={`/movie/${movie.imdbID}`}>
             <motion.div
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative rounded-md overflow-hidden bg-[#181818] aspect-[2/3] cursor-pointer group"
             >
                 <img
-                    src={`${IMAGE_BASE_URL}${movie.poster_path}`}
-                    alt={movie.title}
+                    src={movie.Poster && movie.Poster !== 'N/A' ? movie.Poster : "https://via.placeholder.com/500x750?text=No+Image"}
+                    alt={movie.Title}
                     className="w-full h-full object-cover"
                     loading="lazy"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 flex flex-col justify-end">
-                    <h3 className="text-white font-bold text-sm truncate">{movie.title}</h3>
+                    <h3 className="text-white font-bold text-sm truncate">{movie.Title}</h3>
                     <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-1 text-green-400 text-xs font-bold">
-                            <Star className="w-3 h-3 fill-current" />
-                            {movie.vote_average?.toFixed(1)}
+                            <span className="text-gray-400">{movie.Year}</span>
                         </div>
                         <button
                             onClick={handleFavorite}
