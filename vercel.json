@@ -21,6 +21,10 @@
             "dest": "/backend/server.js"
         },
         {
+            "src": "/movie/(.*)",
+            "dest": "/frontend/movie/[id]"
+        },
+        {
             "src": "/(.*)",
             "dest": "/frontend/$1"
         }
