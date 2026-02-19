@@ -11,7 +11,9 @@ router.get('/', async (req, res) => {
             message: 'Database connection successful',
             userCount,
             env: {
-                hasDbUrl: !!process.env.DATABASE_URL
+                keys: Object.keys(process.env).sort(),
+                hasDbUrl: !!process.env.DATABASE_URL,
+                nodeEnv: process.env.NODE_ENV
             }
         });
     } catch (error) {
